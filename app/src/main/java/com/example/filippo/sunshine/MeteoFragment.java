@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 
 /**
- * A simple {@link Fragm    ent} subclass.
+ * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link MeteoFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
@@ -60,10 +60,12 @@ public class MeteoFragment extends Fragment {
         }
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.meteo_fragment, container,false);
+        new MeteoAsyncTask().execute("http://api.openweathermap.org/data/2.5/forecast?q=94043&mode=json&units=metric&cnt=7");
         return view;
     }
 
