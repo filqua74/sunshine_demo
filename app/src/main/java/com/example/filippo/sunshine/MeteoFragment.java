@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -58,6 +62,7 @@ public class MeteoFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        setHasOptionsMenu(true);
     }
 
 
@@ -65,7 +70,7 @@ public class MeteoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.meteo_fragment, container,false);
-        new MeteoAsyncTask().execute("http://api.openweathermap.org/data/2.5/forecast?q=94043&mode=json&units=metric&cnt=7");
+        //new MeteoAsyncTask().execute("http://api.openweathermap.org/data/2.5/forecast?q=94043&mode=json&units=metric&cnt=7");
         return view;
     }
 
@@ -92,6 +97,26 @@ public class MeteoFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.meteo_fragment_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_refresh:
+                Log.i("sunshine","Premuto refresh");
+                return true;
+            default:
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this
