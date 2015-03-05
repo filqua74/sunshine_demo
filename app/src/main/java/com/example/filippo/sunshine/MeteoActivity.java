@@ -1,14 +1,19 @@
 package com.example.filippo.sunshine;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 public class MeteoActivity extends Activity implements MeteoFragment.OnFragmentInteractionListener {
+
+    ListView listView = null;
+    ArrayAdapter arrayAdapter = null;
 
     protected String[] generateData(int num) {
 
@@ -30,12 +35,12 @@ public class MeteoActivity extends Activity implements MeteoFragment.OnFragmentI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meteo);
 
-        ListView listview = (ListView)findViewById(R.id.meteo_list_view);
+        listView = (ListView)findViewById(R.id.meteo_list_view);
 
-       String[] data = generateData(15);
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,R.layout.meteo_list_item,R.id.meteo_item_row,data);
-        listview.setAdapter(arrayAdapter);
+        arrayAdapter = new ArrayAdapter<String>(this,R.layout.meteo_list_item,R.id.meteo_item_row, new ArrayList<String>());
+        arrayAdapter.setNotifyOnChange(true);
+        listView.setAdapter(arrayAdapter);
+        //String[] data = generateData(15);
     }
 
 
@@ -62,7 +67,11 @@ public class MeteoActivity extends Activity implements MeteoFragment.OnFragmentI
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
+    public void onFragmentInteraction(String[] values) {
+        arrayAdapter.clear();
+        for (String s : values ) {
+            Log.i("sunshine","Added " + s);
+            arrayAdapter.add(s);
+        }
     }
 }

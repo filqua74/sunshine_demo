@@ -2,7 +2,6 @@ package com.example.filippo.sunshine;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +20,7 @@ import android.view.ViewGroup;
  * Use the {@link MeteoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MeteoFragment extends Fragment {
+public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccessResponse {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -75,11 +74,11 @@ public class MeteoFragment extends Fragment {
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    /*public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
-    }
+    }*/
 
     @Override
     public void onAttach(Activity activity) {
@@ -110,6 +109,8 @@ public class MeteoFragment extends Fragment {
         switch (id) {
             case R.id.action_refresh:
                 Log.i("sunshine","Premuto refresh");
+                MeteoAsyncTask myAsync = new MeteoAsyncTask(this);
+                myAsync.execute("94012");
                 return true;
             default:
 
@@ -130,7 +131,17 @@ public class MeteoFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void onFragmentInteraction(String[] values);
+    }
+
+    public void postResult(String result) {
+        try {
+            Log.i("sunshine","Called the delegate");
+            String[] items = MeteoJsonParser.getWeatherDataFromJson(result,7);
+            mListener.onFragmentInteraction(items);
+        } catch (Exception e) {
+            Log.e("sunshine",e.getMessage());
+        }
     }
 
 }
