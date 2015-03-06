@@ -3,6 +3,8 @@ package com.example.filippo.sunshine;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.example.filippo.sunshine.model.MeteoInfo;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +42,7 @@ public class MeteoJsonParser {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    public static String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    public static MeteoInfo[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
@@ -50,8 +52,10 @@ public class MeteoJsonParser {
         final String OWM_MAX = "max";
         final String OWM_MIN = "min";
         final String OWM_DESCRIPTION = "main";
+        final String OWM_ICON = "icon";
 
         JSONObject forecastJson = new JSONObject(forecastJsonStr);
+        Log.i("sunshine",forecastJsonStr);
         JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
         // OWM returns daily forecasts based upon the local time of the city that is being
@@ -71,12 +75,13 @@ public class MeteoJsonParser {
         // now we work exclusively in UTC
         dayTime = new Time();
 
-        String[] resultStrs = new String[numDays];
+        MeteoInfo[] results = new MeteoInfo[numDays];
         for(int i = 0; i < weatherArray.length(); i++) {
             // For now, using the format "Day, description, hi/low"
             String day;
             String description;
             String highAndLow;
+            String icon;
 
             // Get the JSON object representing the day
             JSONObject dayForecast = weatherArray.getJSONObject(i);
@@ -92,6 +97,8 @@ public class MeteoJsonParser {
             // description is in a child array called "weather", which is 1 element long.
             JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
             description = weatherObject.getString(OWM_DESCRIPTION);
+            icon = weatherObject.getString(OWM_ICON);
+            Log.i("sunshine","icon=" + icon);
 
             // Temperatures are in a child object called "temp".  Try not to name variables
             // "temp" when working with temperature.  It confuses everybody.
@@ -100,13 +107,18 @@ public class MeteoJsonParser {
             double low = temperatureObject.getDouble(OWM_MIN);
 
             highAndLow = formatHighLows(high, low);
-            resultStrs[i] = day + " - " + description + " - " + highAndLow;
+
+            results[i] = new MeteoInfo();
+            results[i].setDay(day);
+            results[i].setDescription(description);
+            results[i].setIcon(icon);
+            results[i].setHighAndLow(highAndLow);
         }
 
-        for (String s : resultStrs) {
-            Log.i("sunshine", "Forecast entry: " + s);
+        for (MeteoInfo s : results) {
+            Log.i("sunshine", "Forecast entry: " + s.toString());
         }
-        return resultStrs;
+        return results;
 
     }
 

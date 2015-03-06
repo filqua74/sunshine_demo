@@ -2,6 +2,7 @@ package com.example.filippo.sunshine;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import com.example.filippo.sunshine.adapter.MeteoListAdapter;
+import com.example.filippo.sunshine.helper.MeteoIconsHelper;
+import com.example.filippo.sunshine.helper.MeteoImageAsyncTask;
+import com.example.filippo.sunshine.model.MeteoInfo;
+import com.example.filippo.sunshine.model.MeteoModel;
 
 
 /**
@@ -20,15 +28,12 @@ import android.view.ViewGroup;
  * Use the {@link MeteoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccessResponse {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccessResponse,
+                                                       MeteoImageAsyncTask.IApiAccessResponse {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    MeteoModel model = null;
+    ListView listView = null;
+    MeteoListAdapter adapter = null;
 
     private OnFragmentInteractionListener mListener;
 
@@ -36,16 +41,11 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MeteoFragment.
-     */
+    */
     // TODO: Rename and change types and number of parameters
     public static MeteoFragment newInstance(String param1, String param2) {
         MeteoFragment fragment = new MeteoFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,9 +58,10 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        model = new MeteoModel();
+
         setHasOptionsMenu(true);
     }
 
@@ -69,7 +70,12 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.meteo_fragment, container,false);
-        //new MeteoAsyncTask().execute("http://api.openweathermap.org/data/2.5/forecast?q=94043&mode=json&units=metric&cnt=7");
+        listView = (ListView)view.findViewById(R.id.meteo_list_view);
+
+        adapter = new MeteoListAdapter(this.getActivity(), model);
+        //adapter.setNotifyOnChange(true);
+        listView.setAdapter(adapter);
+
         return view;
     }
 
@@ -118,6 +124,14 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void postResult(Object[] asyncresult) {
+        String key = (String)asyncresult[0];
+        Bitmap bm = (Bitmap)asyncresult[1];
+        MeteoIconsHelper.putMeteoImage(key,bm);
+        adapter.notifyDataSetChanged();
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -131,14 +145,27 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(String[] values);
+        public void onFragmentInteraction(MeteoInfo[] values);
     }
 
     public void postResult(String result) {
         try {
             Log.i("sunshine","Called the delegate");
-            String[] items = MeteoJsonParser.getWeatherDataFromJson(result,7);
-            mListener.onFragmentInteraction(items);
+            MeteoInfo[] items = MeteoJsonParser.getWeatherDataFromJson(result,7);
+
+            model.clear();
+            for (MeteoInfo s : items ) {
+                Log.i("sunshine","Added " + s.toString());
+                model.addMeteoInfo(s);
+                if (MeteoIconsHelper.getMeteoImage(s.getIcon())==null) {
+                    // Try to retrieve icons
+                    Log.i("sunshine","Tentativo di recuperare " + s.getIcon());
+                    MeteoImageAsyncTask myAsync = new MeteoImageAsyncTask(this);
+                    myAsync.execute(s.getIcon());
+                }
+                adapter.notifyDataSetChanged();
+            }
+
         } catch (Exception e) {
             Log.e("sunshine",e.getMessage());
         }
