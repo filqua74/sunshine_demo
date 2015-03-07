@@ -18,6 +18,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MeteoDetailActivity"
+            android:label="@string/title_activity_meteo_detail"
+            android:parentActivityName=".MeteoActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.filippo.sunshine.MeteoActivity" />
+        </activity>
     </application>
 
 </manifest>

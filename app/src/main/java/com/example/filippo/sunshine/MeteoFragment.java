@@ -11,7 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.filippo.sunshine.adapter.MeteoListAdapter;
 import com.example.filippo.sunshine.helper.MeteoIconsHelper;
@@ -75,6 +77,16 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
         adapter = new MeteoListAdapter(this.getActivity(), model);
         //adapter.setNotifyOnChange(true);
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String message = "Clicked an item..." + position;
+                Toast toast = Toast.makeText(MeteoFragment.this.getActivity(),
+                                             message,
+                                             Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
 
         return view;
     }
