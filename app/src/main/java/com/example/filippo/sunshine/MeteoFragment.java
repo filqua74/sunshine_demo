@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.filippo.sunshine.adapter.MeteoListAdapter;
 import com.example.filippo.sunshine.helper.MeteoIconsHelper;
@@ -85,8 +86,12 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
                                              message,
                                              Toast.LENGTH_SHORT);
                 toast.show();*/
-                Intent detailIntent = new Intent(MeteoFragment.this.getActivity(), MeteoDetailActivity.class);
-                MeteoFragment.this.getActivity().startActivity(detailIntent);
+                TextView tv = (TextView)view.findViewById(R.id.meteo_item_row);
+                String selected = tv.getText().toString();
+
+                Intent detailIntent = new Intent(getActivity(), MeteoDetailActivity.class);
+                detailIntent.putExtra(MeteoDetailActivity.EXTRA_MESSAGE, selected);
+                getActivity().startActivity(detailIntent);
             }
         });
 

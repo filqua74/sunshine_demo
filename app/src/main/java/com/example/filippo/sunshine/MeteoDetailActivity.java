@@ -1,17 +1,31 @@
 package com.example.filippo.sunshine;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 public class MeteoDetailActivity extends Activity {
+
+    public static final String EXTRA_MESSAGE = "message";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meteo_detail);
+
+        TextView tv = (TextView)this.findViewById(R.id.meteo_detail_string);
+
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(this.EXTRA_MESSAGE);
+        Log.i("sunshine","DetailActivity=" + message);
+
+        tv.setText(message);
+
     }
 
 
