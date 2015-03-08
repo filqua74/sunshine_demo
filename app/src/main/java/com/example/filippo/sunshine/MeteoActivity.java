@@ -1,6 +1,7 @@
 package com.example.filippo.sunshine;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +35,7 @@ public class MeteoActivity extends Activity implements MeteoFragment.OnFragmentI
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this,MeteoSettingsActivity.class));
             return true;
         }
 
