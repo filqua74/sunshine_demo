@@ -3,8 +3,10 @@ package com.example.filippo.sunshine;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -95,10 +97,13 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
             }
         });
 
-        MeteoAsyncTask myAsync = new MeteoAsyncTask(this);
-        myAsync.execute("94012");
-
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -131,14 +136,22 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
         inflater.inflate(R.menu.meteo_fragment_menu,menu);
     }
 
+    protected void updateWeather() {
+        MeteoAsyncTask myAsync = new MeteoAsyncTask(this);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+        String location = sp.getString(getString(R.string.pref_location_key),null);
+        if (location!=null) {
+            myAsync.execute(location);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_refresh:
-                Log.i("sunshine","Premuto refresh");
-                MeteoAsyncTask myAsync = new MeteoAsyncTask(this);
-                myAsync.execute("94012");
+                //Log.i("sunshine","Premuto refresh");
+                this.updateWeather();
                 return true;
             default:
 

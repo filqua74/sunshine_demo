@@ -45,6 +45,7 @@ public class MeteoDetailActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this,MeteoSettingsActivity.class));
             return true;
         }
 
