@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -153,6 +154,9 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
                 //Log.i("sunshine","Premuto refresh");
                 this.updateWeather();
                 return true;
+            case R.id.action_map:
+                this.openPreferredLocationInMap();
+                return true;
             default:
 
         }
@@ -165,6 +169,31 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
         Bitmap bm = (Bitmap)asyncresult[1];
         MeteoIconsHelper.putMeteoImage(key,bm);
         adapter.notifyDataSetChanged();
+    }
+
+
+    private void openPreferredLocationInMap() {
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = sharedPrefs.getString(
+                getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+
+        // Using the URI scheme for showing a location found on a map.  This super-handy
+        // intent can is detailed in the "Common Intents" page of Android's developer site:
+        // http://developer.android.com/guide/components/intents-common.html#Maps
+        Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
+                .appendQueryParameter("q", location)
+                .build();
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Log.d("sunshine", "Couldn't call " + location + ", no receiving apps installed!");
+        }
     }
 
 
@@ -186,7 +215,8 @@ public class MeteoFragment extends Fragment implements MeteoAsyncTask.IApiAccess
     public void postResult(String result) {
         try {
             Log.i("sunshine","Called the delegate");
-            MeteoInfo[] items = MeteoJsonParser.getWeatherDataFromJson(result,7);
+
+            MeteoInfo[] items = MeteoJsonParser.getWeatherDataFromJson(this, result,7);
 
             model.clear();
             for (MeteoInfo s : items ) {

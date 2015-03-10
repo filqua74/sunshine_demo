@@ -12,7 +12,7 @@ import java.net.URL;
 /**
  * Created by filippo on 02/03/2015.
  */
-public class MeteoAsyncTask extends AsyncTask<String,Void,String> {
+    public class MeteoAsyncTask extends AsyncTask<String,Void,String> {
 
     IApiAccessResponse delegate=null;
 
@@ -54,7 +54,6 @@ public class MeteoAsyncTask extends AsyncTask<String,Void,String> {
             final String FORMAT_PARAM = "mode";
             final String UNITS_PARAM = "units";
             final String DAYS_PARAM = "cnt";
-
 
             Uri myUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                     .appendQueryParameter(FORMAT_PARAM,"json")

@@ -1,7 +1,10 @@
 package com.example.filippo.sunshine;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.format.Time;
 import android.util.Log;
+import android.app.Fragment;
 
 import com.example.filippo.sunshine.model.MeteoInfo;
 
@@ -26,10 +29,23 @@ public class MeteoJsonParser {
     /**
      * Prepare the weather high/lows for presentation.
      */
-    private static String formatHighLows(double high, double low) {
+    private static String formatHighLows(Fragment fragment, double high, double low) {
         // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
+        long roundedHigh;
+        long roundedLow;
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(fragment.getActivity());
+        String unitType = sp.getString(fragment.getString(R.string.pref_units_key),fragment.getString(R.string.pref_location_default));
+
+        if (unitType.equals(fragment.getString(R.string.pref_units_imperial))) {
+            high = (high * 1.8) + 32;
+            low = (low * 1.8) + 32;
+        } else if (!unitType.equals(fragment.getString(R.string.pref_units_metric))) {
+            Log.d("sunshine", "Unit type not found: " + unitType);
+        }
+
+        roundedHigh = Math.round(high);
+        roundedLow = Math.round(low);
 
         String highLowStr = roundedHigh + "/" + roundedLow;
         return highLowStr;
@@ -42,7 +58,7 @@ public class MeteoJsonParser {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    public static MeteoInfo[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    public static MeteoInfo[] getWeatherDataFromJson(Fragment fragment, String forecastJsonStr, int numDays)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
@@ -106,7 +122,7 @@ public class MeteoJsonParser {
             double high = temperatureObject.getDouble(OWM_MAX);
             double low = temperatureObject.getDouble(OWM_MIN);
 
-            highAndLow = formatHighLows(high, low);
+            highAndLow = formatHighLows(fragment, high, low);
 
             results[i] = new MeteoInfo();
             results[i].setDay(day);
