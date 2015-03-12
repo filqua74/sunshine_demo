@@ -39,4 +39,6 @@
 
     <string name="action_map">Mappa</string>
 
+    <string name="action_share">Condividi</string>
+
 </resources>

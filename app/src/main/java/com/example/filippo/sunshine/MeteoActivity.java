@@ -1,15 +1,15 @@
 package com.example.filippo.sunshine;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.filippo.sunshine.model.MeteoInfo;
 
 // Parser class
-public class MeteoActivity extends Activity implements MeteoFragment.OnFragmentInteractionListener {
+public class MeteoActivity extends ActionBarActivity implements MeteoFragment.OnFragmentInteractionListener {
 
 
     @Override
